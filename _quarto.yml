@@ -6,11 +6,11 @@ execute:
   echo: true
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "Broadway"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - AUTHOR1 Cooper Orio (cao2176)
+    - AUTHOR2 Aylmer Liang (agl2162)
+  repo-url: https://github.com/AylmerGit/Broadway
   date: today
   page-footer:
     right: |
