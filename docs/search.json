@@ -2,22 +2,31 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "YOUR PROJECT TITLE",
+    "title": "Broadway",
     "section": "",
-    "text": "1 Introduction"
+    "text": "1 Introduction\nThrough this exploratory data analysis project, we hope to better understand the financial trends of plays, musicals, and other live shows playing on Broadway. In particular, we are interested in seeing the difference in financial performance of musicals compared to plays and other show types, the timeline of certain productions and how their length and other factors are impacted by gross revenue over time, the number of shows on a weekly basis, and more, as well as how the venue impacts sales and other factors. That being said, our analysis will not necessarily be confined to the aforementioned questions, as we fully plan to explore to the best of our ability any other burning questions that pop up during our analysis of the data (perhaps questions regarding revivals [shows that have been staged before, but are being re-staged and reshown by a different production and creative team] and the impact of Tony Awards on sales and longevity [data not found in the datasets we are considering using, but is readily available online and can be manually collected with citations if it is deemed important].",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Introduction</span>"
+    ]
   },
   {
-    "objectID": "data.html#description",
-    "href": "data.html#description",
+    "objectID": "data.html",
+    "href": "data.html",
     "title": "2  Data",
-    "section": "2.1 Description",
-    "text": "2.1 Description"
+    "section": "",
+    "text": "2.1 Description",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Data</span>"
+    ]
   },
   {
     "objectID": "data.html#missing-value-analysis",
     "href": "data.html#missing-value-analysis",
     "title": "2  Data",
     "section": "2.2 Missing value analysis",
-    "text": "2.2 Missing value analysis"
+    "text": "2.2 Missing value analysis",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Data</span>"
+    ]
   }
 ]
