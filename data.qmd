@@ -1,10 +1,11 @@
 # Data
-Our main dataset for this project will be the broadway.csv dataset available on the CORGIS database project (linked here: https://corgis-edu.github.io/corgis/csv/broadway/). This dataset is in CSV file format, has 12 columns and 31296 rows, doesn’t seem to be updated very frequently (the data ends in 2016), and is quite thorough. However, we reached out to the author of the dataset asking for ways to get more recent data in the format they had it (they have yet to get back to us as of writing).
+Our main dataset for this project will be the broadway.csv dataset available on the [CORGIS database project](https://corgis-edu.github.io/corgis/csv/broadway/). This dataset is in CSV file format, has 12 columns and 31296 rows, doesn’t seem to be updated very frequently (the data ends in 2016), and is quite thorough. However, we reached out to the author of the dataset asking for ways to get more recent data in the format they had it (they have yet to get back to us as of writing).
 
-We tried extracting the data from where the author of the prior dataset cites his data from, the Broadway League website itself (https://www.broadwayleague.com/research/grosses-broadway-nyc/#weekly_grosses). This would be done for some arbitrarily large number of weeks, adapting an approach described by Professor Robbins – using the rvest library, reading from html over and over again, and appending the data subsets into one large usable one. The raw data from the website is updated weekly, and is similarly thorough, but is much more tedious to extract. 
+We tried extracting the data from where the author of the prior dataset cites his data from, the [Broadway League website](https://www.broadwayleague.com/research/grosses-broadway-nyc/#weekly_grosses). This would be done for some arbitrarily large number of weeks, adapting an approach described by Professor Robbins – using the rvest library, reading from html over and over again, and appending the data subsets into one large usable one. The raw data from the website is updated weekly, and is similarly thorough, but is much more tedious to extract. 
 
 ```{r}
-library(tidyverse)
+suppressMessages(library(tidyverse))
+suppressMessages(library(knitr))
 BroadwayData <- read_csv("Raw_Data/broadway.csv", show_col_types = FALSE)
 ```
 
@@ -20,11 +21,14 @@ The columns of our data are: <br><br>
 <span style="color:blue;">Statistics Attendance:</span> Total number of people who attended during that week<br>
 <span style="color:blue;">Statistics.Capacity:</span> The percentage of the Theatre that was filled during that week<br>
 <span style="color:blue;">Statistics.Gross:</span> The total amount, in dollars, the Show made for the week<br>
-<span style="color:blue;">Statistics.Gross Potential:</span> This is a percentage of gross total made in the week over the possible total made in the week. In the <br>
+<span style="color:blue;">Statistics.Gross Potential:</span> This is a percentage of gross total made in the week(Statistics.Gross) over the possible/feasible total for the same week. In the this column the author of the dataset already converted all the NAs into 0.<br>
 <span style="color:blue;">Statistics.Performances:</span> Number of performances that occured during that week<br>
 
+To get a quick idea of the data, here is the summary of each column
 ```{r}
-colnames(BroadwayData)
+#|fig.width=10
+#|fig.height=10
+kable(summary(BroadwayData))
 ```
 
 ## Missing value analysis
