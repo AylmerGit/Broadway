@@ -1,9 +1,35 @@
 # Data
-We are still undecided regarding which data set to explore, but have narrowed it down to two potential options. First is the broadway.csv dataset available on the CORGIS database project (linked here: https://corgis-edu.github.io/corgis/csv/broadway/). This dataset is in CSV file format, has 12 columns and {*****} rows, doesn’t seem to be updated very frequently (the data ends in 2016), and is quite thorough. This is the leading contender due to its completeness & accessibility. Furthermore, the dataset’s author is still reachable via email (we have yet to get a response at time of writing, though). 
+Our main dataset for this project will be the broadway.csv dataset available on the [CORGIS database project](https://corgis-edu.github.io/corgis/csv/broadway/). This dataset is in CSV file format, has 12 columns and 31296 rows, doesn’t seem to be updated very frequently (the data ends in 2016), and is quite thorough. However, we reached out to the author of the dataset asking for ways to get more recent data in the format they had it (they have yet to get back to us as of writing).
 
-Second involves extracting data from where the author of the prior dataset cites his data from, the Broadway League website itself (https://www.broadwayleague.com/research/grosses-broadway-nyc/#weekly_grosses). This would be done for some arbitrarily large number of weeks, adapting an approach described by Professor Robbins–using the rvest library, reading from html over and over again, and appending the data subsets into one large usable one. The raw data from the website is updated weekly, and is similarly thorough, but is much more tedious to extract. 
-Upon manual inspection, there does not appear to be any formally “missing” values in the broadway.csv data set; however, the description of the data set by the compiler of the set itself mentions that any rows for which the “gross potential” could not be found or calculated had its “gross potential” value set to 0 as default. Barring extreme outliers such as weeks with 0 ticket sales, which we are under the impression is impossible, the 0 value should be unique to such rows with the absent value. Thus, we should be able to treat the data set as if all ‘na’ values were housed in the “gross potential” row and were replaced by 0.
+We tried extracting the data from where the author of the prior dataset cites his data from, the [Broadway League website](https://www.broadwayleague.com/research/grosses-broadway-nyc/#weekly_grosses). This would be done for some arbitrarily large number of weeks, adapting an approach described by Professor Robbins – using the rvest library, reading from html over and over again, and appending the data subsets into one large usable one. The raw data from the website is updated weekly, and is similarly thorough, but is much more tedious to extract. 
+
+```{r}
+suppressMessages(library(tidyverse))
+suppressMessages(library(knitr))
+BroadwayData <- read_csv("Raw_Data/broadway.csv", show_col_types = FALSE)
+```
 
 ## Description
+The columns of our data are: <br><br>
+<span style="color:blue;">Day:</span> Day of the Month when the Show ended for that week, e.g. 12 means that for that week the last show was on the 12 day of the Month<br>
+<span style="color:blue;">Date Full:</span> MM/DD/YYYY format of the Date<br>
+<span style="color:blue;">Month:</span> Month of the Year for the Show<br>
+<span style="color:blue;">Year:</span> Year for the Show<br>
+<span style="color:blue;">Show Name:</span> Name of the Show/Production<br>
+<span style="color:blue;">Show Theatre:</span> Name of the Theatre where the show was played<br>
+<span style="color:blue;">Show Type:</span> Musical, Play, Special<br>
+<span style="color:blue;">Statistics Attendance:</span> Total number of people who attended during that week<br>
+<span style="color:blue;">Statistics.Capacity:</span> The percentage of the Theatre that was filled during that week<br>
+<span style="color:blue;">Statistics.Gross:</span> The total amount, in dollars, the Show made for the week<br>
+<span style="color:blue;">Statistics.Gross Potential:</span> This is a percentage of gross total made in the week(Statistics.Gross) over the possible/feasible total for the same week. In the this column the author of the dataset already converted all the NAs into 0.<br>
+<span style="color:blue;">Statistics.Performances:</span> Number of performances that occured during that week<br>
+
+To get a quick idea of the data, here is the summary of each column
+```{r}
+#|fig.width=10
+#|fig.height=10
+kable(summary(BroadwayData))
+```
 
 ## Missing value analysis
+Upon manual inspection, there does not appear to be any formally “missing” values in the broadway.csv data set; however, the description of the data set by the compiler of the set itself mentions that any rows for which the “gross potential” could not be found or calculated had its “gross potential” value set to 0 as default. Barring extreme outliers such as weeks with 0 ticket sales, which we are under the impression is impossible, the 0 value should be unique to such rows with the absent value. Thus, we should be able to treat the data set as if all ‘na’ values were housed in the “gross potential” row and were replaced by 0.

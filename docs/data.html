@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -176,13 +210,160 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>We are still undecided regarding which data set to explore, but have narrowed it down to two potential options. First is the broadway.csv dataset available on the CORGIS database project (linked here: https://corgis-edu.github.io/corgis/csv/broadway/). This dataset is in CSV file format, has 12 columns and {*****} rows, doesn’t seem to be updated very frequently (the data ends in 2016), and is quite thorough. This is the leading contender due to its completeness &amp; accessibility. Furthermore, the dataset’s author is still reachable via email (we have yet to get a response at time of writing, though).</p>
-<p>Second involves extracting data from where the author of the prior dataset cites his data from, the Broadway League website itself (https://www.broadwayleague.com/research/grosses-broadway-nyc/#weekly_grosses). This would be done for some arbitrarily large number of weeks, adapting an approach described by Professor Robbins–using the rvest library, reading from html over and over again, and appending the data subsets into one large usable one. The raw data from the website is updated weekly, and is similarly thorough, but is much more tedious to extract. Upon manual inspection, there does not appear to be any formally “missing” values in the broadway.csv data set; however, the description of the data set by the compiler of the set itself mentions that any rows for which the “gross potential” could not be found or calculated had its “gross potential” value set to 0 as default. Barring extreme outliers such as weeks with 0 ticket sales, which we are under the impression is impossible, the 0 value should be unique to such rows with the absent value. Thus, we should be able to treat the data set as if all ‘na’ values were housed in the “gross potential” row and were replaced by 0.</p>
+<p>Our main dataset for this project will be the broadway.csv dataset available on the <a href="https://corgis-edu.github.io/corgis/csv/broadway/">CORGIS database project</a>. This dataset is in CSV file format, has 12 columns and 31296 rows, doesn’t seem to be updated very frequently (the data ends in 2016), and is quite thorough. However, we reached out to the author of the dataset asking for ways to get more recent data in the format they had it (they have yet to get back to us as of writing).</p>
+<p>We tried extracting the data from where the author of the prior dataset cites his data from, the <a href="https://www.broadwayleague.com/research/grosses-broadway-nyc/#weekly_grosses">Broadway League website</a>. This would be done for some arbitrarily large number of weeks, adapting an approach described by Professor Robbins – using the rvest library, reading from html over and over again, and appending the data subsets into one large usable one. The raw data from the website is updated weekly, and is similarly thorough, but is much more tedious to extract.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressMessages</span>(<span class="fu">library</span>(tidyverse))</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressMessages</span>(<span class="fu">library</span>(knitr))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>BroadwayData <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"Raw_Data/broadway.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <section id="description" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="description"><span class="header-section-number">2.1</span> Description</h2>
+<p>The columns of our data are: <br><br> <span style="color:blue;">Day:</span> Day of the Month when the Show ended for that week, e.g.&nbsp;12 means that for that week the last show was on the 12 day of the Month<br> <span style="color:blue;">Date Full:</span> MM/DD/YYYY format of the Date<br> <span style="color:blue;">Month:</span> Month of the Year for the Show<br> <span style="color:blue;">Year:</span> Year for the Show<br> <span style="color:blue;">Show Name:</span> Name of the Show/Production<br> <span style="color:blue;">Show Theatre:</span> Name of the Theatre where the show was played<br> <span style="color:blue;">Show Type:</span> Musical, Play, Special<br> <span style="color:blue;">Statistics Attendance:</span> Total number of people who attended during that week<br> <span style="color:blue;">Statistics.Capacity:</span> The percentage of the Theatre that was filled during that week<br> <span style="color:blue;">Statistics.Gross:</span> The total amount, in dollars, the Show made for the week<br> <span style="color:blue;">Statistics.Gross Potential:</span> This is a percentage of gross total made in the week(Statistics.Gross) over the possible/feasible total for the same week. In the this column the author of the dataset already converted all the NAs into 0.<br> <span style="color:blue;">Statistics.Performances:</span> Number of performances that occured during that week<br></p>
+<p>To get a quick idea of the data, here is the summary of each column</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#|fig.width=10</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#|fig.height=10</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">summary</span>(BroadwayData))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 1%">
+<col style="width: 6%">
+<col style="width: 7%">
+<col style="width: 6%">
+<col style="width: 5%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 12%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Date.Day</th>
+<th style="text-align: left;">Date.Full</th>
+<th style="text-align: left;">Date.Month</th>
+<th style="text-align: left;">Date.Year</th>
+<th style="text-align: left;">Show.Name</th>
+<th style="text-align: left;">Show.Theatre</th>
+<th style="text-align: left;">Show.Type</th>
+<th style="text-align: left;">Statistics.Attendance</th>
+<th style="text-align: left;">Statistics.Capacity</th>
+<th style="text-align: left;">Statistics.Gross</th>
+<th style="text-align: left;">Statistics.Gross Potential</th>
+<th style="text-align: left;">Statistics.Performances</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Min. : 1.00</td>
+<td style="text-align: left;">Length:31296</td>
+<td style="text-align: left;">Min. : 1.000</td>
+<td style="text-align: left;">Min. :1990</td>
+<td style="text-align: left;">Length:31296</td>
+<td style="text-align: left;">Length:31296</td>
+<td style="text-align: left;">Length:31296</td>
+<td style="text-align: left;">Min. : 24</td>
+<td style="text-align: left;">Min. : 10.00</td>
+<td style="text-align: left;">Min. : 1037</td>
+<td style="text-align: left;">Min. : 0.0</td>
+<td style="text-align: left;">Min. : 0.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">1st Qu.: 8.00</td>
+<td style="text-align: left;">Class :character</td>
+<td style="text-align: left;">1st Qu.: 4.000</td>
+<td style="text-align: left;">1st Qu.:2001</td>
+<td style="text-align: left;">Class :character</td>
+<td style="text-align: left;">Class :character</td>
+<td style="text-align: left;">Class :character</td>
+<td style="text-align: left;">1st Qu.: 5508</td>
+<td style="text-align: left;">1st Qu.: 70.00</td>
+<td style="text-align: left;">1st Qu.: 320108</td>
+<td style="text-align: left;">1st Qu.: 45.0</td>
+<td style="text-align: left;">1st Qu.: 8.000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Median :16.00</td>
+<td style="text-align: left;">Mode :character</td>
+<td style="text-align: left;">Median : 6.000</td>
+<td style="text-align: left;">Median :2006</td>
+<td style="text-align: left;">Mode :character</td>
+<td style="text-align: left;">Mode :character</td>
+<td style="text-align: left;">Mode :character</td>
+<td style="text-align: left;">Median : 7802</td>
+<td style="text-align: left;">Median : 83.00</td>
+<td style="text-align: left;">Median : 514520</td>
+<td style="text-align: left;">Median : 63.0</td>
+<td style="text-align: left;">Median : 8.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Mean :15.72</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Mean : 6.509</td>
+<td style="text-align: left;">Mean :2006</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Mean : 8011</td>
+<td style="text-align: left;">Mean : 80.74</td>
+<td style="text-align: left;">Mean : 596069</td>
+<td style="text-align: left;">Mean : 62.4</td>
+<td style="text-align: left;">Mean : 7.225</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">3rd Qu.:23.00</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">3rd Qu.:10.000</td>
+<td style="text-align: left;">3rd Qu.:2011</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">3rd Qu.:10348</td>
+<td style="text-align: left;">3rd Qu.: 95.00</td>
+<td style="text-align: left;">3rd Qu.: 785269</td>
+<td style="text-align: left;">3rd Qu.: 82.0</td>
+<td style="text-align: left;">3rd Qu.: 8.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Max. :31.00</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Max. :12.000</td>
+<td style="text-align: left;">Max. :2016</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Max. :21631</td>
+<td style="text-align: left;">Max. :892.00</td>
+<td style="text-align: left;">Max. :3201333</td>
+<td style="text-align: left;">Max. :226.0</td>
+<td style="text-align: left;">Max. :16.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 <section id="missing-value-analysis" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</h2>
+<p>Upon manual inspection, there does not appear to be any formally “missing” values in the broadway.csv data set; however, the description of the data set by the compiler of the set itself mentions that any rows for which the “gross potential” could not be found or calculated had its “gross potential” value set to 0 as default. Barring extreme outliers such as weeks with 0 ticket sales, which we are under the impression is impossible, the 0 value should be unique to such rows with the absent value. Thus, we should be able to treat the data set as if all ‘na’ values were housed in the “gross potential” row and were replaced by 0.</p>
 
 
 </section>
