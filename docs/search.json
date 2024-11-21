@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Broadway",
     "section": "",
-    "text": "1 Introduction\nThrough this exploratory data analysis project, we hope to better understand the financial trends of plays, musicals, and other live shows playing on Broadway. In particular, we are interested in seeing the difference in financial performance of musicals compared to plays and other show types, the timeline of certain productions and how their length and other factors are impacted by gross revenue over time, the number of shows on a weekly basis, and more, as well as how the venue impacts sales and other factors. That being said, our analysis will not necessarily be confined to the aforementioned questions, as we fully plan to explore to the best of our ability any other burning questions that pop up during our analysis of the data (perhaps questions regarding revivals [shows that have been staged before, but are being re-staged and reshown by a different production and creative team] and the impact of Tony Awards on sales and longevity [data not found in the datasets we are considering using, but is readily available online and can be manually collected with citations if it is deemed important].",
+    "text": "1 Introduction\nThe Broadway industry is a cornerstone of live entertainment, renowned for its artistic performances and creative experience. The industry has continually adapted and evolved in response to a changing world. Through this exploratory data analysis project, we hope to better understand the financial trends of plays, musicals, and other live shows playing on Broadway. In particular, we are interested in seeing the difference in financial performance of musicals compared to plays and other show types, the timeline of certain productions and how their length and other factors are impacted by gross revenue over time, the number of shows on a weekly basis, and more, as well as how the venue impacts sales and other factors. That being said, our analysis will not necessarily be confined to the aforementioned questions, as we fully plan to explore to the best of our ability any other burning questions that pop up during our analysis of the data (perhaps questions regarding revivals [shows that have been staged before, but are being re-staged and reshown by a different production and creative team] and the impact of Tony Awards on sales and longevity [data not found in the datasets we are considering using, but is readily available online and can be manually collected with citations if it is deemed important]).",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Introduction</span>"
     ]
@@ -14,7 +14,7 @@
     "href": "data.html",
     "title": "2  Data",
     "section": "",
-    "text": "2.1 Description",
+    "text": "2.1 Description\nThe columns of our data are:  Day: Day of the Month when the Show ended for that week, e.g. 12 means that for that week the last show was on the 12 day of the Month Date Full: MM/DD/YYYY format of the Date Month: Month of the Year for the Show Year: Year for the Show Show Name: Name of the Show/Production Show Theatre: Name of the Theatre where the show was played Show Type: Musical, Play, Special Statistics Attendance: Total number of people who attended during that week Statistics.Capacity: The percentage of the Theatre that was filled during that week Statistics.Gross: The total amount, in dollars, the Show made for the week Statistics.Gross Potential: This is a percentage of gross total made in the week over the possible total made in the week. In the  Statistics.Performances: Number of performances that occured during that week\nCode\ncolnames(BroadwayData)\n\n\n [1] \"Date.Day\"                   \"Date.Full\"                 \n [3] \"Date.Month\"                 \"Date.Year\"                 \n [5] \"Show.Name\"                  \"Show.Theatre\"              \n [7] \"Show.Type\"                  \"Statistics.Attendance\"     \n [9] \"Statistics.Capacity\"        \"Statistics.Gross\"          \n[11] \"Statistics.Gross Potential\" \"Statistics.Performances\"",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Data</span>"
     ]
@@ -24,7 +24,7 @@
     "href": "data.html#missing-value-analysis",
     "title": "2  Data",
     "section": "2.2 Missing value analysis",
-    "text": "2.2 Missing value analysis",
+    "text": "2.2 Missing value analysis\nUpon manual inspection, there does not appear to be any formally “missing” values in the broadway.csv data set; however, the description of the data set by the compiler of the set itself mentions that any rows for which the “gross potential” could not be found or calculated had its “gross potential” value set to 0 as default. Barring extreme outliers such as weeks with 0 ticket sales, which we are under the impression is impossible, the 0 value should be unique to such rows with the absent value. Thus, we should be able to treat the data set as if all ‘na’ values were housed in the “gross potential” row and were replaced by 0.",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Data</span>"
     ]
