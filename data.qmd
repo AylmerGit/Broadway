@@ -8,6 +8,7 @@ suppressMessages(library(tidyverse))
 suppressMessages(library(ggplot2))
 suppressMessages(library(knitr))
 suppressMessages(library(janitor))
+suppressWarnings(library(janitor))
 BroadwayData <- read_csv("Raw_Data/broadway.csv", show_col_types = FALSE)
 ```
 
@@ -65,3 +66,17 @@ ggplot(df_long, aes(x = Variable, y = as.factor(date_year), fill = MissingPropor
        fill = "Missing Proportion") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+As we can see most of the missing data comes from the earlier years of the dataset. Our guess is that they did not have as good of a way to track this data, perhaps some was lost or simply not calculated for those weeks.
+
+```{r}
+missing_data <- data.frame(
+  Variable = df_summary$date_year,
+  MissingProportion = (df_summary$statistics_gross_potential)
+)
+ggplot(missing_data, aes(x = Variable, y = MissingProportion)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Proportion of Missing Values", x = "Year", y = "Missing Proportion") +
+  theme_minimal()
+
+```
+Here is a more detailed look into the Gross Potenital Column and the proportion that were missing from the data set. We can clearly see that in the early years the Gross Potential might have not been tracked.
