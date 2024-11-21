@@ -7,8 +7,7 @@ We tried extracting the data from where the author of the prior dataset cites hi
 suppressMessages(library(tidyverse))
 suppressMessages(library(ggplot2))
 suppressMessages(library(knitr))
-suppressMessages(library(janitor))
-suppressWarnings(library(janitor))
+suppressMessages(suppressWarnings(library(janitor)))
 BroadwayData <- read_csv("Raw_Data/broadway.csv", show_col_types = FALSE)
 ```
 
