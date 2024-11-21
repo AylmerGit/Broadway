@@ -5,7 +5,9 @@ We tried extracting the data from where the author of the prior dataset cites hi
 
 ```{r}
 suppressMessages(library(tidyverse))
+suppressMessages(library(ggplot2))
 suppressMessages(library(knitr))
+suppressMessages(library(janitor))
 BroadwayData <- read_csv("Raw_Data/broadway.csv", show_col_types = FALSE)
 ```
 
@@ -33,3 +35,33 @@ kable(summary(BroadwayData))
 
 ## Missing value analysis
 Upon manual inspection, there does not appear to be any formally “missing” values in the broadway.csv data set; however, the description of the data set by the compiler of the set itself mentions that any rows for which the “gross potential” could not be found or calculated had its “gross potential” value set to 0 as default. Barring extreme outliers such as weeks with 0 ticket sales, which we are under the impression is impossible, the 0 value should be unique to such rows with the absent value. Thus, we should be able to treat the data set as if all ‘na’ values were housed in the “gross potential” row and were replaced by 0.
+
+```{r}
+#|fig.width=15
+#|fig.height=30
+
+missingval <- BroadwayData
+missingval$`Statistics.Gross Potential`[missingval$`Statistics.Gross Potential` == 0] <- NA
+
+df_missing <- missingval |> 
+  mutate(across(-Date.Year, ~ ifelse(is.na(.), 1, 0)))
+
+df_missing <- df_missing |> clean_names()
+
+df_summary <- df_missing |> 
+  group_by(date_year) |> 
+  summarize(across(everything(), mean))
+
+df_long <- df_summary |> 
+  pivot_longer(cols = -date_year, names_to = "Variable", values_to = "MissingProportion")
+
+ggplot(df_long, aes(x = Variable, y = as.factor(date_year), fill = MissingProportion)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "red") +  # Adjust colors as needed
+  theme_minimal() +
+  labs(title = "Missing Values Heatmap",
+       x = "Variable",
+       y = "Year",
+       fill = "Missing Proportion") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
