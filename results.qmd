@@ -4,6 +4,7 @@ suppressMessages(library(tidyverse))
 suppressMessages(library(ggplot2))
 suppressMessages(library(knitr))
 suppressMessages(suppressWarnings(library(janitor)))
+suppressMessages(library(scales))
 BroadwayData <- read_csv("Raw_Data/broadway.csv", show_col_types = FALSE)
 colnames(BroadwayData) <- c("Day", "Date", "Month","Year","Show_Name","Show_Theatre","Show_Type","Attendance","Capacity","Gross","Gross_Potential","Performances")
 ```
@@ -17,11 +18,35 @@ colnames(BroadwayData) <- c("Day", "Date", "Month","Year","Show_Name","Show_Thea
 
 5) Attendance by year and/or month (Aylmer) 
 ```{r}
-ggplot(BroadwayData, aes(A))
+attendance_by_year <- BroadwayData |> 
+  group_by(Year) |> 
+  summarize(total_attendance = sum(Attendance), .groups = "drop")
+
+ggplot(attendance_by_year, aes(x = Year, y = total_attendance)) +
+  geom_col(fill = "skyblue") +
+  labs(title = "Total Attendance by Year", x = "Year", y = "Total Attendance Count")+
+  scale_y_continuous(labels = label_number(big.mark = ","),
+                     breaks = seq(0, max(attendance_by_year$total_attendance), by = 2500000))
+```
+
+```{r}
+attendance_by_month <- BroadwayData |> 
+  group_by(Month) |> 
+  summarize(avg_attendance = mean(Attendance), .groups = "drop")
+
+attendance_by_month$Month <- month.abb[attendance_by_month$Month]
+attendance_by_month$Month <- factor(attendance_by_month$Month, levels = month.abb)
+
+ggplot(attendance_by_month, aes(x = Month, y = avg_attendance)) +
+  geom_col(fill = "skyblue") +
+  labs(title = "Average Attendance by Month", x = "Month", y = "Average Attendance Count")+
+  scale_y_continuous(labels = label_number(big.mark = ","),
+                     breaks = seq(6000, 10000, by = 500))+
+  coord_cartesian(ylim = c(7000, 9000))
 ```
 6) swap 3 and 4's faceting of show type and month (i.e facet by month, plot the 3 show types) (Cooper) 
 
-7) Stacked bar chart attendance & capacity vs year (Aylmer)
+7) Stacked bar chart attendance & capacity vs year Exclude (Aylmer)
 
 8) Stacked bar chart attendance & capacity for each theatre (Aylmer) 
 
