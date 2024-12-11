@@ -28,5 +28,25 @@
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Data</span>"
     ]
+  },
+  {
+    "objectID": "d3graph.html",
+    "href": "d3graph.html",
+    "title": "4  Interactive graph",
+    "section": "",
+    "text": "Toggle Theater Data",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Interactive graph</span>"
+    ]
+  },
+  {
+    "objectID": "results.html",
+    "href": "results.html",
+    "title": "3  Results",
+    "section": "",
+    "text": "Code\nsuppressMessages(library(tidyverse))\nsuppressMessages(library(ggplot2))\nsuppressMessages(library(knitr))\nsuppressMessages(suppressWarnings(library(janitor)))\nsuppressMessages(library(scales))\nBroadwayData &lt;- read_csv(\"Raw_Data/broadway.csv\", show_col_types = FALSE)\ncolnames(BroadwayData) &lt;- c(\"Day\", \"Date\", \"Month\",\"Year\",\"Show_Name\",\"Show_Theatre\",\"Show_Type\",\"Attendance\",\"Capacity\",\"Gross\",\"Gross_Potential\",\"Performances\")\n\n\n\nLinear graph of Attendance vs Gross or gross potential (Cooper)\nDo the above, but faceted by show.type (Cooper)\nGross by Month and/or year (Cooper) - Test out combinations (facet by year?)\nfacet again by show.type (Cooper)\nAttendance by year and/or month (Aylmer)\n\n\n\nCode\nattendance_by_year &lt;- BroadwayData |&gt; \n  group_by(Year) |&gt; \n  summarize(total_attendance = sum(Attendance), .groups = \"drop\")\n\nggplot(attendance_by_year, aes(x = Year, y = total_attendance)) +\n  geom_col(fill = \"skyblue\") +\n  labs(title = \"Total Attendance by Year\", x = \"Year\", y = \"Total Attendance Count\")+\n  scale_y_continuous(labels = label_number(big.mark = \",\"),\n                     breaks = seq(0, max(attendance_by_year$total_attendance), by = 2500000))\n\n\n\n\n\n\n\n\n\n\n\nCode\nattendance_by_month &lt;- BroadwayData |&gt; \n  group_by(Month) |&gt; \n  summarize(avg_attendance = mean(Attendance), .groups = \"drop\")\n\nattendance_by_month$Month &lt;- month.abb[attendance_by_month$Month]\nattendance_by_month$Month &lt;- factor(attendance_by_month$Month, levels = month.abb)\n\nggplot(attendance_by_month, aes(x = Month, y = avg_attendance)) +\n  geom_col(fill = \"skyblue\") +\n  labs(title = \"Average Attendance by Month\", x = \"Month\", y = \"Average Attendance Count\")+\n  scale_y_continuous(labels = label_number(big.mark = \",\"),\n                     breaks = seq(6000, 10000, by = 500))+\n  coord_cartesian(ylim = c(7000, 9000))\n\n\n\n\n\n\n\n\n\n\nswap 3 and 4’s faceting of show type and month (i.e facet by month, plot the 3 show types) (Cooper)\nStacked bar chart attendance & capacity vs year Exclude (Aylmer)\nStacked bar chart attendance & capacity for each theatre (Aylmer)\nInteractive idea for now: 1) show some trend year by year (animation or selection tool) or 2) Put together an interactive predictor",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Results</span>"
+    ]
   }
 ]
