@@ -1,1 +1,28 @@
 # Results
+```{r}
+suppressMessages(library(tidyverse))
+suppressMessages(library(ggplot2))
+suppressMessages(library(knitr))
+suppressMessages(suppressWarnings(library(janitor)))
+BroadwayData <- read_csv("Raw_Data/broadway.csv", show_col_types = FALSE)
+colnames(BroadwayData) <- c("Day", "Date", "Month","Year","Show_Name","Show_Theatre","Show_Type","Attendance","Capacity","Gross","Gross_Potential","Performances")
+```
+1) Linear graph of Attendance vs Gross or gross potential (Cooper)
+
+2) Do the above, but faceted by show.type (Cooper) 
+
+3) Gross by Month and/or year (Cooper) - Test out combinations (facet by year?)
+
+4) facet again by show.type (Cooper) 
+
+5) Attendance by year and/or month (Aylmer) 
+```{r}
+ggplot(BroadwayData, aes(A))
+```
+6) swap 3 and 4's faceting of show type and month (i.e facet by month, plot the 3 show types) (Cooper) 
+
+7) Stacked bar chart attendance & capacity vs year (Aylmer)
+
+8) Stacked bar chart attendance & capacity for each theatre (Aylmer) 
+
+9) Interactive idea for now: 1) show some trend year by year (animation or selection tool) or 2) Put together an interactive predictor
