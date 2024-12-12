@@ -1,10 +1,10 @@
-# Interactive graph
+# Interactive Graph
 
 <style>
   * {
     font-family: sans-serif;
   }
-  
+
   /* Add some styling for the button */
   #toggleTheater {
     margin: 10px;
@@ -19,15 +19,20 @@
   #toggleTheater:hover {
     background-color: #45a049;
   }
-  
-</style> 
+
+  /* Styling for the dropdown */
+  select {
+    padding: 5px;
+    margin-right: 10px;
+  }
+</style>
 
 <div id="plot">
 </div>
 
-<!-- Button to toggle the theater data -->
-<button id="toggleTheater">Toggle Theater Data</button>
+<select id="theaterSelect">
+  <option value="All">All Theaters</option> 
+</select>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="scripts/myscript.js"></script>
-
