@@ -4,10 +4,30 @@
   * {
     font-family: sans-serif;
   }
+  
+  /* Add some styling for the button */
+  #toggleTheater {
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  #toggleTheater:hover {
+    background-color: #45a049;
+  }
+  
 </style> 
 
 <div id="plot">
 </div>
 
+<!-- Button to toggle the theater data -->
+<button id="toggleTheater">Toggle Theater Data</button>
+
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="scripts/myscript.js"></script>
+
