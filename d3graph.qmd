@@ -19,11 +19,12 @@
   #toggleTheater:hover {
     background-color: #45a049;
   }
-
+  
   /* Styling for the dropdown */
   select {
     padding: 5px;
     margin-right: 10px;
+    
   }
 </style>
 
@@ -33,6 +34,7 @@
 <select id="theaterSelect">
   <option value="All">All Theaters</option> 
 </select>
+
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="scripts/myscript.js"></script>
