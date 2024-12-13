@@ -35,17 +35,17 @@ ggplot(total_theatre_data, aes(x = Total.Gross, y = reorder(Show.Theatre, Total.
   theme(axis.text.y = element_text(size = 5.6),
         axis.text.x = element_text(size = 10))
 ```
-So then, we decided to take a look at the shows' gross revenue throughout their runs over time, and see which shows grossed the most from 1990 to 2016. And to connect this data to the graph above, we decided to color the points by the theatre that the shows began in. As we will see shortly, this was a naive approach to coloring, as it gives some information, but leaves out other info.
+So then, we decided to take a look at the shows' gross revenue throughout their runs over time, and see which shows grossed the most from 1990 to 2016. And to connect this data to the graph above, we decided to color the points by the theatre that the shows began in (first ever theatre that released that show). As we will see shortly, this was a naive approach to coloring, as it gives some information, but leaves out other info.
 
 Cleveland Dot Plot of the top grossing Broadway shows from 1990 to 2016, colored by the theatre they started in.
 ```{r}
-total_gross_data <- work_broadway |>
+total_gross_data <- suppressMessages({work_broadway |>
   group_by(Show.Name) |>
   summarise(Total.Gross = sum(Statistics.Gross, na.rm = TRUE),
             Show.Theatre = first(Show.Theatre)) |>
   arrange(desc(Total.Gross)) |>
   ungroup() |>
-  slice_head(n = 40)
+  slice_head(n = 40)})
 
 # Create Cleveland dot plot with color by Show.Theatre
 ggplot(total_gross_data, aes(x = Total.Gross, y = reorder(Show.Name, Total.Gross), color = Show.Theatre)) +
@@ -66,11 +66,11 @@ ggplot(total_gross_data, aes(x = Total.Gross, y = reorder(Show.Name, Total.Gross
          label.position = "right",
          ncol = 1))
 ```
-The graph above does give interesting insight into the top 40 highest grossing Broadway shows during the period the data set ranges from (1990 to 2016), with there being just a few shows that grossed 400 million dollars during the run, and the rest grossing less than that. However, something seemed fishy when looking at the gross amounts in conjuction with the theatres that we colored by.
+The graph above does give interesting insight into the top 40 highest grossing Broadway shows during the period the data set ranges from (1990 to 2016), with there being just a few shows that grossed 400 million dollars during the run, and the rest grossing less than that. However, something seemed fishy when looking at the gross amounts in conjunction with the theatres that we colored by.
 
-The theatres represented above don't seem to line-up with the top grossing theatres in the theatres-solo cleveland dot plot--for example, Lion King grossed over a billion dollars in its run up to 2016, and began in the New Amsterdam Theatre, but the New Amsterdam Theatre didn't gross above a billion dollars in this same time frame. This fact lead me to consider why this is the case, and the only reasonable answer we could come up with is that these shows either had revivals at a different location (eg. ended one production in one theatre and began another in another), or transferred productions to a different location during its run (eg. one production from one theatre to another). 
+The theatres represented above don't seem to line-up with the top grossing theatres in the theatres-solo cleveland dot plot--for example, Lion King grossed over a billion dollars in its run up to 2016, and began in the New Amsterdam Theatre, but the New Amsterdam Theatre didn't gross above a billion dollars in this same time frame. This fact lead us to consider why this is the case, and the only reasonable answer we could come up with is that these shows either had revivals at a different location (eg. ended one production in one theatre and began another in another), or transferred productions to a different location during its run (eg. one production from one theatre to another). 
 
-So, we added another column to the data set which essentially faceted the gross earnings of the shows by their theatres. We added the theatres as colors, and as part of the y labeles as we felt this, while technically redundant coloring, helped to read the graph a bit easier.
+So, we added another column to the data set which essentially faceted the gross earnings of the shows by their theatres. We added the theatres as colors, and as part of the y labels as we felt this, while technically redundant coloring, helped to read the graph a bit easier.
 
 
 Cleveland Dot plot of total gross outcomes for different shows, separating by the different theatres they were in (as some shows could have moved location, or had revivals). (top 40):
@@ -80,12 +80,12 @@ work_broadway <- work_broadway |>
   mutate(ShowTheatreCombo = paste(Show.Name, " (", Show.Theatre, ")", sep = ""))
 
 # Group by Show.Name and Show.Theatre, then summarize the total gross for each combination
-show_theatre_gross <- work_broadway |>
+show_theatre_gross <- suppressMessages({work_broadway |>
   group_by(ShowTheatreCombo, Show.Theatre) |>
   summarise(Total.Gross = sum(Statistics.Gross, na.rm = TRUE)) |>
   arrange(desc(Total.Gross)) |>
   ungroup() |>
-  slice_head(n = 40)
+  slice_head(n = 40)})
 
 # Had to refactor because it was out of order when I incorporated the new column
 show_theatre_gross$ShowTheatreCombo <- factor(show_theatre_gross$ShowTheatreCombo, 
@@ -198,18 +198,54 @@ ggplot(weekly_gross, aes(x = Date.Full, y = Total.Gross)) +
         axis.title.x = element_text(size = 12),
         axis.title.y = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5),
-        panel.grid.major.x = element_line(color = "lightgray", size = 0.5),
-        panel.grid.minor.x = element_line(color = "gray", linetype = "dotted", size = 0.25)
+        panel.grid.major.x = element_line(color = "lightgray", linewidth = 0.5),
+        panel.grid.minor.x = element_line(color = "gray", linetype = "dotted", linewidth = 0.25)
         )
 ```
 Before exploring the question we set out to answer, let's discuss the time series trends on the whole first. Here, we see pretty clear booms most years during the winter holidays, and bumps during the summertime and mid spring (potentially lining up with summer breaks and spring breaks for students, respecively?). We also see impacts of notable historic events in NYC on this chart, such as all Broadway theatres shutting down from September 11th to the 13th in 2001 due to the 9/11 terrorist attacks on the world trade center & a commensurate drop in gross revenue that week shown above (among other events).
 
+We wanted to further explore the Attendance vs Time to see if it followed the same pattern as the line graph above for the Total Gross vs Time.
+```{r}
+attendance_by_year <- BroadwayData |> 
+  group_by(Year) |> 
+  summarize(total_attendance = sum(Attendance), .groups = "drop")
+
+ggplot(attendance_by_year, aes(x = Year, y = total_attendance)) +
+  geom_col(fill = "skyblue") +
+  labs(title = "Total Attendance by Year", x = "Year", y = "Total Attendance Count")+
+  scale_y_continuous(labels = label_number(big.mark = ","),
+                     breaks = seq(0, max(attendance_by_year$total_attendance), by = 2500000))
+```
+The bargraph above shows the total attendance each year across all the theatres and as we can see Broadway show attendance greatly boomed in the 1990s and have reached a steady and consistent level of attendance afterwards. As mentioned before, we see that there have been declines in years of total attendance such as 2000 to 2001 presumably due to 9/11. The last bar on the far right is not at the same level as the other years because the data ends in August of that year, so it was still missing 1/3 of the year worth of attendance.
+
+Also we see that there appeared to be constant growth in the line graph between the Total Gross and the years, however, we do not see the same growth in the total attendance. This leads us to believe they constantly raised the prices of tickets. It does make sense to increase prices if you know that people will still buy your tickets.
+
+Building on the bargraph of Total Attendance vs Year, and the line graph above it, we noticed in the line graph there appeared to be seasonal trends. Which led us to investigate the seasonal trends further.
+```{r}
+attendance_by_month <- BroadwayData |> 
+  group_by(Month) |> 
+  summarize(avg_attendance = mean(Attendance), .groups = "drop")
+
+attendance_by_month$Month <- month.abb[attendance_by_month$Month]
+attendance_by_month$Month <- factor(attendance_by_month$Month, levels = month.abb)
+
+ggplot(attendance_by_month, aes(x = Month, y = avg_attendance)) +
+  geom_col(fill = "skyblue") +
+  labs(title = "Average Attendance by Month", x = "Month", y = "Average Attendance Count")+
+  scale_y_continuous(labels = label_number(big.mark = ","),
+                     breaks = seq(6000, 10000, by = 500))+
+  coord_cartesian(ylim = c(7000, 9000))
+```
+As we can see in the bargraph above, there appears to be a cyclical trend where the average attendance for broadway shows seems to peak in the summer (July and August). This trend was slightly apparent in the line graph between the Gross vs Time, however this bargraph confirms our hypothesis. 
+
+The second peak appears to be in December-January, where there tends to be more holidays and days off for people to attend Broadway shows. Especially, college students having breaks in December to January and July to August, it makes sense that Broadway Attendance spikes in accordance with college students' and other students' schedule.
+
 But back to the question: have musicals, plays, or specials historically made more money on Broadway? To answer this, we again just faceted by show type, and plotted the same time series.
 ```{r}
-weekly_gross_type <- work_broadway |>
+weekly_gross_type <- suppressMessages({work_broadway |>
   group_by(Date.Full, Show.Type) |>
   summarise(Total.Gross = sum(Statistics.Gross, na.rm = TRUE)) |>
-  ungroup()
+  ungroup()})
 
 # Create the time series plot and facet by Show.Type
 ggplot(weekly_gross_type, aes(x = Date.Full, y = Total.Gross)) +
@@ -226,8 +262,8 @@ ggplot(weekly_gross_type, aes(x = Date.Full, y = Total.Gross)) +
         axis.title.x = element_text(size = 12),
         axis.title.y = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5),
-        panel.grid.major.x = element_line(color = "lightgray", size = 0.5),
-        panel.grid.minor.x = element_line(color = "gray", linetype = "dotted", size = 0.25)
+        panel.grid.major.x = element_line(color = "lightgray", linewidth = 0.5),
+        panel.grid.minor.x = element_line(color = "gray", linetype = "dotted", linewidth = 0.25)
         )
 ```
 Here we see that musicals pretty clearly earn more gross revenue, followed by plays and then specials. Specials coming in last should be no surprise, since they are typically limited time engagements at these theatres, and will often occur to fill the space between two different productions in the space. However, we also see that plays in aggregate seem to earn less than musicals, and have a greater variance in their earning trends over time. The former point again is to be expected, as fewer plays occur on Broadway compared to musicals (nearly 75% of shows on Broadway are musicals). However, this disparity does still have bearing on our question, as one would expect that this uneven distribution of the number of musicals to number of plays is not on accident, but rather a result of the profitability of the shows themselves respectively. Investors are almost always more likely to fund productions they think will make more money in the long run so as to maximize their ROI, and seeing as musicals are more often put on in Broadway, one can infer that investors fund them more often, and that they ought to have reason for doing so. So, while not concretely answered by the graph above, we can reasonably infer that Musicals make more money on Broadway compared to plays.
@@ -238,10 +274,10 @@ What might give more evidence for this conclusion could be looking at ticket pri
 work_broadway$Ticket.Price <- work_broadway$Statistics.Gross / work_broadway$Statistics.Attendance
 
 # Group by Date.Full and Show.Type, and calculate the average ticket price for each group
-weekly_ticket_price <- work_broadway |>
+weekly_ticket_price <- suppressMessages({work_broadway |>
   group_by(Date.Full, Show.Type) |>
   summarise(Average.Ticket.Price = mean(Ticket.Price, na.rm = TRUE)) |>
-  ungroup()
+  ungroup()})
 
 # Create the time series plot and facet by Show.Type
 ggplot(weekly_ticket_price, aes(x = Date.Full, y = Average.Ticket.Price)) +
@@ -258,8 +294,8 @@ ggplot(weekly_ticket_price, aes(x = Date.Full, y = Average.Ticket.Price)) +
         axis.title.x = element_text(size = 12),
         axis.title.y = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5),
-        panel.grid.major.x = element_line(color = "lightgray", size = 0.5),
-        panel.grid.minor.x = element_line(color = "gray", linetype = "dotted", size = 0.25)
+        panel.grid.major.x = element_line(color = "lightgray", linewidth = 0.5),
+        panel.grid.minor.x = element_line(color = "gray", linetype = "dotted", linewidth = 0.25)
         )
 ```
 
@@ -268,10 +304,10 @@ Looking at these ticket prices, they do seem pretty comparable to one another, s
 #Calculated the average total weekly capacity of the theatres, and faceted by show type on that.
 work_broadway$Theatre.Capacity <- round(100*work_broadway$Statistics.Attendance / work_broadway$Statistics.Capacity)
 
-weekly_capacity <- work_broadway |>
+weekly_capacity <- suppressMessages({work_broadway |>
   group_by(Date.Full, Show.Type) |>
   summarise(Average.Capacity = mean(Theatre.Capacity, na.rm = TRUE)) |>
-  ungroup()
+  ungroup()})
 
 # Create the time series plot and facet by Show.Type
 ggplot(weekly_capacity, aes(x = Date.Full, y = Average.Capacity)) +
@@ -288,52 +324,8 @@ ggplot(weekly_capacity, aes(x = Date.Full, y = Average.Capacity)) +
         axis.title.x = element_text(size = 12),
         axis.title.y = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5),
-        panel.grid.major.x = element_line(color = "lightgray", size = 0.5),
-        panel.grid.minor.x = element_line(color = "gray", linetype = "dotted", size = 0.25)
+        panel.grid.major.x = element_line(color = "lightgray", linewidth = 0.5),
+        panel.grid.minor.x = element_line(color = "gray", linetype = "dotted", linewidth = 0.25)
         )
 ```
-Here we do actually see some meaninful difference in the average capacity of theatres holding musicals vs plays, with musicals tending to occur in higher capacity theatres on average compared to plays. This provides further evidence of our inferred conclusion that we made earlier, that musicals are more profitable on average compared to plays, though it is again sort of a chicken-or-the-egg situation. That is, it is hard to decisively conclude if Musicals get access to these larger theatres because they are expected to generate the revenue to pay for them long term, or if they are more able to generate the revenue to pay for staying there because they have more seats they can fill in the first place by being at these larger theatres.
-
-1) Linear graph of Attendance vs Gross or gross potential (Cooper)
-
-2) Do the above, but faceted by show.type (Cooper) 
-
-3) Gross by Month and/or year (Cooper) - Test out combinations (facet by year?)
-
-4) facet again by show.type (Cooper) 
-
-5) Attendance by year and/or month (Aylmer) 
-```{r}
-attendance_by_year <- BroadwayData |> 
-  group_by(Year) |> 
-  summarize(total_attendance = sum(Attendance), .groups = "drop")
-
-ggplot(attendance_by_year, aes(x = Year, y = total_attendance)) +
-  geom_col(fill = "skyblue") +
-  labs(title = "Total Attendance by Year", x = "Year", y = "Total Attendance Count")+
-  scale_y_continuous(labels = label_number(big.mark = ","),
-                     breaks = seq(0, max(attendance_by_year$total_attendance), by = 2500000))
-```
-
-```{r}
-attendance_by_month <- BroadwayData |> 
-  group_by(Month) |> 
-  summarize(avg_attendance = mean(Attendance), .groups = "drop")
-
-attendance_by_month$Month <- month.abb[attendance_by_month$Month]
-attendance_by_month$Month <- factor(attendance_by_month$Month, levels = month.abb)
-
-ggplot(attendance_by_month, aes(x = Month, y = avg_attendance)) +
-  geom_col(fill = "skyblue") +
-  labs(title = "Average Attendance by Month", x = "Month", y = "Average Attendance Count")+
-  scale_y_continuous(labels = label_number(big.mark = ","),
-                     breaks = seq(6000, 10000, by = 500))+
-  coord_cartesian(ylim = c(7000, 9000))
-```
-6) swap 3 and 4's faceting of show type and month (i.e facet by month, plot the 3 show types) (Cooper) 
-
-7) Stacked bar chart attendance & capacity vs year Exclude (Aylmer)
-
-8) Stacked bar chart attendance & capacity for each theatre (Aylmer) 
-
-9) Interactive idea for now: 1) show some trend year by year (animation or selection tool) or 2) Put together an interactive predictor
+Here we do actually see some meaningful difference in the average capacity of theatres holding musicals vs plays, with musicals tending to occur in higher capacity theatres on average compared to plays. This provides further evidence of our inferred conclusion that we made earlier, that musicals are more profitable on average compared to plays, though it is again sort of a chicken-or-the-egg situation. That is, it is hard to decisively conclude if Musicals get access to these larger theatres because they are expected to generate the revenue to pay for them long term, or if they are more able to generate the revenue to pay for staying there because they have more seats they can fill in the first place by being at these larger theatres.
