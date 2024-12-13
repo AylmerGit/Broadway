@@ -159,5 +159,4 @@ textElement2.style.fontFamily = "sans-serif";
 
 selectElement.after(textElement1);
 selectElement.after(textElement2); 
-textElement1.style.color = "black"; 
-textElement2.style.color = "black"; 
+
